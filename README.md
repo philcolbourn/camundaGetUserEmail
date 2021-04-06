@@ -1,6 +1,8 @@
 # camundaGetUserEmail
 Get user's email address using Camunda REST API
 
+Based on [camunda-http-connector-example](https://github.com/rob2universe/camunda-http-connector-example).
+
 There is currently no easy way (that I know of without Java coding) to get a user's email address (same for firstName and lastName).
 
 Camunda REST API allows us to get a user's profile from their user ID:
