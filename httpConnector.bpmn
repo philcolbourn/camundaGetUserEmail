@@ -62,7 +62,7 @@ Activity ID: ${execution.activityId}
     <bpmn:userTask id="getUser" name="get user" camunda:assignee="demo">
       <bpmn:extensionElements>
         <camunda:formData>
-          <camunda:formField id="userId" label="User ID" type="string" defaultValue="colbourp" />
+          <camunda:formField id="userId" label="User ID" type="string" defaultValue="demo" />
         </camunda:formData>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1nqfwsv</bpmn:incoming>
