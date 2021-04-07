@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1bfyqf9" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.6.0">
+  <bpmn:process id="HttpConnectorTestProcessBPMN" name="Http Connector Test BPMN" isExecutable="true" camunda:versionTag="1">
+    <bpmn:startEvent id="start" name="start">
+      <bpmn:outgoing>Flow_1nqfwsv</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_1nqfwsv" sourceRef="start" targetRef="getUser" />
+    <bpmn:endEvent id="end" name="end">
+      <bpmn:extensionElements>
+        <camunda:executionListener event="start">
+          <camunda:script scriptFormat="javascript">print("Email found: " + userEmail)</camunda:script>
+        </camunda:executionListener>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0bjbddg</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="getEmailForUserViaRest" name="get email for user via REST">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="method">GET</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Accept">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="url">http://localhost:8080/engine-rest/user/${userId}/profile</camunda:inputParameter>
+            <camunda:outputParameter name="userEmail">${S(response).prop("email").stringValue()}</camunda:outputParameter>
+            <camunda:outputParameter name="userRecord">${response}</camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1q1lmc8</bpmn:incoming>
+      <bpmn:outgoing>Flow_10qvcqj</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_10qvcqj" sourceRef="getEmailForUserViaRest" targetRef="sendEmail" />
+    <bpmn:sequenceFlow id="Flow_0bjbddg" sourceRef="sendEmail" targetRef="end" />
+    <bpmn:sendTask id="sendEmail" name="send email">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="text">User Record: ${userRecord}
+First Name: ${S(userRecord).prop("firstName").stringValue()}
+Last Name: ${S(userRecord).prop("lastName").stringValue()}
+Email: ${S(userRecord).prop("email").stringValue()}
+
+Current User: ${currentUser()}
+Current User Groups: ${currentUserGroups()}
+Activity ID: ${execution.activityId}
+
+</camunda:inputParameter>
+            <camunda:inputParameter name="subject">got email address!</camunda:inputParameter>
+            <camunda:inputParameter name="to">${userEmail}</camunda:inputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>mail-send</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_10qvcqj</bpmn:incoming>
+      <bpmn:outgoing>Flow_0bjbddg</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:sequenceFlow id="Flow_1q1lmc8" sourceRef="getUser" targetRef="getEmailForUserViaRest" />
+    <bpmn:userTask id="getUser" name="get user" camunda:assignee="demo">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="userId" label="User ID" type="string" defaultValue="colbourp" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1nqfwsv</bpmn:incoming>
+      <bpmn:outgoing>Flow_1q1lmc8</bpmn:outgoing>
+    </bpmn:userTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="HttpConnectorTestProcessBPMN">
+      <bpmndi:BPMNEdge id="Flow_10qvcqj_di" bpmnElement="Flow_10qvcqj">
+        <di:waypoint x="500" y="117" />
+        <di:waypoint x="560" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1nqfwsv_di" bpmnElement="Flow_1nqfwsv">
+        <di:waypoint x="208" y="117" />
+        <di:waypoint x="250" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0bjbddg_di" bpmnElement="Flow_0bjbddg">
+        <di:waypoint x="660" y="117" />
+        <di:waypoint x="732" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1q1lmc8_di" bpmnElement="Flow_1q1lmc8">
+        <di:waypoint x="350" y="117" />
+        <di:waypoint x="400" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_0qlchhx_di" bpmnElement="getEmailForUserViaRest">
+        <dc:Bounds x="400" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0ecaepl_di" bpmnElement="sendEmail">
+        <dc:Bounds x="560" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="start">
+        <dc:Bounds x="172" y="99" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="181" y="142" width="21" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1cjtqva_di" bpmnElement="getUser">
+        <dc:Bounds x="250" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_10cywgh_di" bpmnElement="end">
+        <dc:Bounds x="732" y="99" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="742" y="142" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
